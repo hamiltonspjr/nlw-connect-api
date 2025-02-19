@@ -1,5 +1,6 @@
 import type { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import z from 'zod'
+import { subscribeToEvent } from '../functions/subscribe-to-event'
 
 export const subscribeToEventRoute: FastifyPluginAsyncZod = async app => {
   app.post(
@@ -14,8 +15,7 @@ export const subscribeToEventRoute: FastifyPluginAsyncZod = async app => {
         }),
         response: {
           201: z.object({
-            name: z.string(),
-            email: z.string(),
+            subscriberId: z.string(),
           }),
         },
       },
@@ -23,7 +23,8 @@ export const subscribeToEventRoute: FastifyPluginAsyncZod = async app => {
     async (request, response) => {
       const { name, email } = request.body
       // criação da inscrição no banco de dados
-      return response.status(201).send({ name, email })
+      const { subscriberId } = await subscribeToEvent({ name, email })
+      return response.status(201).send({ subscriberId })
     }
   )
 }
